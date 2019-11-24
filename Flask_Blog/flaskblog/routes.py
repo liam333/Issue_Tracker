@@ -3,7 +3,7 @@ import secrets
 from PIL import Image
 from flask import render_template, url_for, flash, redirect, request, abort
 from flaskblog import app, db, bcrypt
-from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
+from flaskblog.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, IncidentSearchForm
 from flaskblog.models import User, Post
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -12,7 +12,11 @@ from flask_login import login_user, current_user, logout_user, login_required
 def home():
     page = request.args.get('page', 1, type=int)
     posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
-    return render_template('home.html', posts=posts)
+    search = IncidentSearchForm(request.form)
+    if request.method == 'POST':
+        return search_results(search)
+    return render_template('home.html', posts=posts, form=search)
+
 
 
 
@@ -162,3 +166,21 @@ def user_posts(username):
         .order_by(Post.date_posted.desc())\
         .paginate(page=page, per_page=5)
     return render_template('user_posts.html', posts=posts, user=user)
+
+
+@app.route('/results', methods=['GET', 'POST'])
+def search_results(search):
+    page = request.args.get('page', 1, type=int)
+    posts = Post.query.order_by(Post.date_posted.desc()).paginate(page=page, per_page=5)
+    results = []
+    search_string = search.data['search']
+
+    if search.data['search'] == '':
+        qry = db.session.query(Post)
+        results = qry.all()
+        return render_template('results.html', results=results, posts=posts, search=search_string)
+
+    else:
+        # display results
+        return render_template('results.html', results=results, posts=posts, search=search_string)
+

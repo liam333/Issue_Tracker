@@ -1,7 +1,7 @@
 from flask_wtf import FlaskForm
 from flask_wtf.file import FileField, FileAllowed
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField, SelectField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 from flaskblog.models import User
 from flaskblog.models import Incident
@@ -66,5 +66,11 @@ class PostForm(FlaskForm):
     assigned_by = StringField('Assigned By', render_kw={"placeholder": "For Admin"})
     history = TextAreaField('Admin notes and History', render_kw={"placeholder": "For Admin"})
     submit = SubmitField('Post')
+
+
+class IncidentSearchForm(FlaskForm):
+    choices = [('Keywords', 'Keywords')]
+    select = SelectField('Search for an incident:', choices=choices)
+    search = StringField('')
 
 
