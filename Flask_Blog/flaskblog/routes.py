@@ -179,7 +179,6 @@ def search_results(search):
         qry = db.session.query(Post)
         results = qry.all()
         return render_template('results.html', results=results, posts=posts, search=search_string)
-
     else:
         # display results
         return render_template('results.html', results=results, posts=posts, search=search_string)
